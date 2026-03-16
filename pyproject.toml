@@ -1,0 +1,110 @@
+# =============================================================================
+# DocForge — Offline Document Intelligence System
+# =============================================================================
+# Ingests PDF corpora, extracts structured metadata via Vision-Language Models
+# and heuristic pipelines, produces deterministic canonical filenames, and
+# organises documents into domain-specific folder structures.
+#
+# Works across all domains — engineering, maritime, legal, academic,
+# corporate, and more.
+# =============================================================================
+
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "docforge"
+version = "1.0.0"
+description = "Offline document intelligence: extract metadata, rename, and organise PDF collections"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "Sri" }]
+keywords = [
+    "pdf", "document", "metadata", "rename", "organise",
+    "vlm", "ocr", "engineering", "classification",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing :: General",
+    "Topic :: Scientific/Engineering",
+]
+
+# ---------------------------------------------------------------------------
+# Core dependencies (always installed)
+# ---------------------------------------------------------------------------
+dependencies = [
+    "PyMuPDF>=1.24.0",           # PDF parsing, text extraction, page rendering
+    "click>=8.1.0",              # CLI framework
+    "Pillow>=10.0.0",            # Image handling for rendered pages
+    "unidecode>=1.3.0",          # Unicode → ASCII for safe filenames
+    "psutil>=5.9.0",             # System profiling (CPU, RAM, disk)
+    "rich>=13.0.0",              # Beautiful terminal output, progress bars
+    "requests>=2.31.0",          # HTTP client for Ollama / llama.cpp APIs
+    "python-dateutil>=2.8.0",    # Robust date parsing
+    "openpyxl>=3.1.0",           # Excel export (.xlsx)
+    "tomli>=2.0.0;python_version<'3.11'",  # TOML parsing for Python <3.11
+]
+
+# ---------------------------------------------------------------------------
+# Optional dependency groups
+# ---------------------------------------------------------------------------
+[project.optional-dependencies]
+vlm = [
+    "llama-cpp-python>=0.2.0",   # Alternative VLM runtime (GGUF models)
+]
+ocr = [
+    "pytesseract>=0.3.10",       # Tesseract OCR wrapper
+]
+gpu = [
+    "torch>=2.0.0",              # PyTorch for GPU-accelerated VLM
+    "transformers>=4.40.0",      # HuggingFace Transformers runtime
+]
+gui = [
+    "PySide6>=6.6.0",            # Qt6 GUI framework
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.3.0",
+    "mypy>=1.8.0",
+]
+all = [
+    "docforge[vlm,ocr,gpu,gui,dev]",
+]
+
+# ---------------------------------------------------------------------------
+# CLI entry point
+# ---------------------------------------------------------------------------
+[project.scripts]
+docforge = "docforge.cli.main:cli"
+
+# ---------------------------------------------------------------------------
+# Tool configuration
+# ---------------------------------------------------------------------------
+[tool.hatch.build.targets.wheel]
+packages = ["src/docforge"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
